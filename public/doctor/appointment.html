@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Appointments - Synapse</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="doctor.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-logo">
+          <svg
+            class="w-8 h-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <!-- Clean Medical Cross -->
+            <rect
+              x="4"
+              y="4"
+              width="16"
+              height="16"
+              rx="2"
+              fill="#dc2626"
+              class="text-red-600"
+            />
+            <path
+              d="M12 8v8M8 12h8"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span> &nbsp;ग्रामीण-आरोग्य</span>
+        </div>
+
+        <div class="header-actions">
+          <span id="doctorName" class="text-gray-700 font-medium"></span>
+          <button onclick="logout()" class="flex items-center gap-2">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <nav class="sidebar-nav">
+          <a href="../doctor.html" class="nav-link" id="dashboard-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="prescription.html" class="nav-link" id="prescriptions-link">
+            <i class="fas fa-file-medical"></i>
+            <span>Prescriptions</span>
+          </a>
+          <a href="appointment.html" class="nav-link" id="appointments-link">
+            <i class="fas fa-clock"></i>
+            <span>Appointments</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="content-container">
+          <!-- Welcome Section -->
+          <div class="welcome-section mb-8">
+            <h1 class="text-3xl font-bold">Manage Appointments</h1>
+            <p class="mt-2 opacity-90">
+              View and manage your patient appointments
+            </p>
+          </div>
+
+          <!-- Filters Section -->
+          <div class="card mb-6">
+            <div class="flex flex-wrap gap-4">
+              <select id="statusFilter" class="form-input">
+                <option value="all">All Status</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <input type="date" id="dateFilter" class="form-input" />
+
+              <button onclick="resetFilters()" class="btn btn-primary">
+                Reset Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Appointments List -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Appointments</h2>
+            </div>
+            <div id="appointmentsList" class="space-y-4"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Appointment Details Modal -->
+    <div id="appointmentModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">
+            Appointment Details
+          </h3>
+          <button
+            onclick="closeAppointmentModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="appointmentDetails" class="space-y-4"></div>
+        <div class="flex justify-end space-x-4 mt-6">
+          <button
+            id="completeAppointmentBtn"
+            onclick="updateAppointmentStatus('completed')"
+            class="btn btn-primary"
+          >
+            Mark as Completed
+          </button>
+          <button
+            id="cancelAppointmentBtn"
+            onclick="updateAppointmentStatus('cancelled')"
+            class="btn btn-danger"
+          >
+            Cancel Appointment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="doctor.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        if (!sessionStorage.getItem("token")) {
+          window.location.href = "/index.html";
+          return;
+        }
+
+        // Load appointments when page loads
+        await loadAppointments();
+
+        // Set up filter event listeners
+        document.getElementById("statusFilter").addEventListener("change", filterAppointments);
+        document.getElementById("dateFilter").addEventListener("change", filterAppointments);
+
+        const currentPath = window.location.pathname;
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.remove("active");
+        });
+        if (currentPath.includes("doctor.html")) {
+          document.getElementById("dashboard-link").classList.add("active");
+        } else if (currentPath.includes("prescription.html")) {
+          document.getElementById("prescriptions-link").classList.add("active");
+        } else if (currentPath.includes("appointment.html")) {
+          document.getElementById("appointments-link").classList.add("active");
+        }
+      });
+
+      async function loadAppointments() {
+        try {
+          const response = await fetch("/api/doctor/appointments", {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+          });
+
+          if (!response.ok) throw new Error("Failed to fetch appointments");
+
+          const appointments = await response.json();
+          
+          // Sort appointments by creation date (newest first)
+          appointments.sort((a, b) => b._id.localeCompare(a._id));
+          
+          displayAppointments(appointments);
+        } catch (error) {
+          console.error("Error loading appointments:", error);
+          document.getElementById("appointmentsList").innerHTML =
+            '<p class="text-gray-600 text-center">Failed to load appointments</p>';
+        }
+      }
+
+      function getStatusClass(status) {
+        const classes = {
+          pending: "bg-yellow-100 text-yellow-800",
+          scheduled: "bg-blue-100 text-blue-800",
+          completed: "bg-green-100 text-green-800",
+          cancelled: "bg-red-100 text-red-800",
+        };
+        return classes[status.toLowerCase()] || "bg-gray-100 text-gray-800";
+      }
+
+      function filterAppointments() {
+        const statusFilter = document.getElementById("statusFilter").value;
+        const dateFilter = document.getElementById("dateFilter").value;
+
+        const appointments = document.querySelectorAll("#appointmentsList > div");
+        appointments.forEach(appointment => {
+          const status = appointment.querySelector("[data-status]").dataset.status;
+          const date = appointment.querySelector("[data-date]").dataset.date;
+
+          const statusMatch = statusFilter === "all" || status === statusFilter;
+          const dateMatch = !dateFilter || date === dateFilter;
+
+          appointment.style.display = statusMatch && dateMatch ? "block" : "none";
+        });
+      }
+
+      function resetFilters() {
+        document.getElementById("statusFilter").value = "all";
+        document.getElementById("dateFilter").value = "";
+        filterAppointments();
+      }
+
+      function displayAppointments(appointments) {
+        const container = document.getElementById("appointmentsList");
+        
+        if (!appointments || appointments.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-center">No appointments found</p>';
+          return;
+        }
+
+        container.innerHTML = appointments
+          .map(appointment => `
+            <div class="bg-white rounded-lg shadow p-4 mb-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-semibold text-lg">Patient: ${appointment.patient.name}</h3>
+                  <p class="text-gray-500 mt-2" data-date="${appointment.date}">
+                    <i class="far fa-calendar"></i> ${new Date(appointment.date).toLocaleDateString()}
+                    <i class="far fa-clock ml-3"></i> ${appointment.time}
+                  </p>
+                  ${appointment.notes ? `
+                    <p class="text-gray-600 mt-2">
+                      <i class="fas fa-notes-medical"></i> Notes: ${appointment.notes}
+                    </p>
+                  ` : ''}
+                </div>
+                <span class="px-3 py-1 rounded-full text-sm ${getStatusClass(appointment.status)}" 
+                      data-status="${appointment.status}">
+                  ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                </span>
+              </div>
+
+              ${appointment.files && appointment.files.length > 0 ? `
+                <div class="mt-4 pt-4 border-t">
+                  <h4 class="text-gray-700 font-medium mb-2">
+                    <i class="fas fa-paperclip"></i> Attachments (${appointment.files.length})
+                  </h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    ${appointment.files.map(file => `
+                      <div class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <div class="flex items-center gap-2">
+                          <i class="${getFileIcon(file.mimetype || 'application/octet-stream')}"></i>
+                          <span class="text-sm text-gray-600">${file.originalName || file.filename}</span>
+                        </div>
+                        <div class="flex gap-2">
+                          <button onclick="viewFile('${appointment._id}', '${file.filename}')" 
+                            class="text-blue-600 hover:text-blue-800 p-1">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          <button onclick="downloadFile('${appointment._id}', '${file.filename}', '${file.originalName || file.filename}')"
+                            class="text-green-600 hover:text-green-800 p-1">
+                            <i class="fas fa-download"></i>
+                          </button>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="flex justify-end mt-4 space-x-2">
+                <button onclick="showAppointmentDetails('${appointment._id}')" 
+                  class="btn btn-primary">
+                  View Details
+                </button>
+                <button onclick="window.location.href='http://localhost:4000'"
+                  class="btn btn-success">
+                  Join Call
+                </button>
+              </div>
+            </div>
+          `).join('');
+      }
+
+      function getFileIcon(mimetype) {
+        if (mimetype.includes('pdf')) {
+          return 'fas fa-file-pdf text-red-500';
+        } else if (mimetype.includes('image')) {
+          return 'fas fa-file-image text-green-500';
+        } else if (mimetype.includes('word') || mimetype.includes('document')) {
+          return 'fas fa-file-word text-blue-500';
+        }
+        return 'fas fa-file text-gray-500';
+      }
+
+      async function viewFile(appointmentId, filename) {
+        try {
+          const response = await fetch(`/api/appointments/${appointmentId}/file/${filename}`, {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+          });
+
+          if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to fetch file');
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } catch (error) {
+          console.error('Error viewing file:', error);
+          alert('Failed to view file. Please try again.');
+        }
+      }
+
+      async function downloadFile(appointmentId, filename, originalName) {
+        try {
+          const response = await fetch(`/api/appointments/${appointmentId}/file/${filename}`, {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+          });
+
+          if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to fetch file');
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = originalName || filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        } catch (error) {
+          console.error('Error downloading file:', error);
+          alert('Failed to download file. Please try again.');
+        }
+      }
+    </script>
+  </body>
+</html>
