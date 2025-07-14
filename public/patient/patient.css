@@ -52,8 +52,8 @@ body {
   left: var(--sidebar-width);
   right: 0;
   height: var(--header-height);
-  background: white;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 40;
@@ -79,8 +79,8 @@ body {
   display: flex;
   align-items: center;
   padding: 0 1.75rem;
-  background: white;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
   z-index: 50;
   box-shadow: 1px 0 2px 0 rgba(0, 0, 0, 0.03);
 }
@@ -106,8 +106,8 @@ body {
   left: 0;
   width: var(--sidebar-width);
   height: calc(100vh - var(--header-height));
-  background: white;
-  border-right: 1px solid rgba(229, 231, 235, 0.5);
+  background: var(--bg-white);
+  border-right: 1px solid var(--border-color);
   padding: 1.5rem 0.75rem;
   overflow-y: auto;
   transition: all 0.3s ease;
@@ -132,6 +132,22 @@ body {
   font-size: 0.9375rem;
   position: relative;
   text-decoration: none;
+  background: var(--background-light);
+}
+
+body.dark .nav-link {
+  background: #23272f;
+  color: #cbd5e1;
+}
+
+body.dark .nav-link:hover {
+  background: #31343c;
+  color: #fff;
+}
+
+body.dark .nav-link.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  color: #fff;
 }
 
 .nav-link:hover {
@@ -197,11 +213,16 @@ body {
 .main-content {
   grid-area: main;
   padding: 2rem;
+  background: var(--bg-light);
  
   min-height: calc(100vh - var(--header-height));
   background: #f9fafb;
   overflow-y: auto;
   max-height: calc(100vh - var(--header-height));
+}
+
+body.dark .main-content {
+  background: #181c24;
 }
 
 /* Scrollbar styling */
@@ -226,13 +247,18 @@ body {
 .content-container {
   max-width: 1280px;
   margin: 0 auto;
+  background: transparent;
+}
+
+body.dark .content-container {
+  background: transparent;
 }
 
 /* Card styles */
 .card {
   background: var(--bg-white);
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
@@ -254,18 +280,18 @@ body {
   gap: 0.625rem;
   padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;
-  color: var(--text-color);
+  background: var(--bg-white);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   transition: all 0.2s ease;
   font-weight: 500;
   font-size: 0.9375rem;
-  background: transparent;
-  border: 1px solid transparent;
 }
 
 .header-actions button:hover {
-  background: rgba(37, 99, 235, 0.04);
+  background: var(--background-light);
   color: var(--primary-color);
-  border-color: rgba(37, 99, 235, 0.1);
+  border-color: var(--primary-color);
 }
 
 /* User profile */
@@ -275,8 +301,8 @@ body {
   gap: 0.875rem;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  background: rgba(37, 99, 235, 0.04);
-  border: 1px solid rgba(37, 99, 235, 0.1);
+  background: var(--background-light);
+  border: 1px solid var(--border-color);
 }
 
 .user-profile span {
@@ -304,7 +330,7 @@ body {
 
 /* Form Section */
 .form-section {
-  background-color: white;
+  background-color: var(--bg-white);
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: var(--card-shadow);
@@ -379,7 +405,7 @@ body {
 
 /* Prescriptions Section */
 .prescriptions-section {
-  background-color: white;
+  background-color: var(--bg-white);
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: var(--card-shadow);
@@ -600,4 +626,26 @@ body {
 
 .goog-te-balloon-frame {
   display: none !important;
+}
+
+.bg-white {
+  background-color: #fff !important;
+}
+
+body.dark .bg-white {
+  background-color: #23272f !important;
+  color: #fff !important;
+}
+body.dark .bg-white * {
+  color: #fff !important;
+}
+body.dark .bg-white i,
+body.dark .bg-white .text-blue-600,
+body.dark .bg-white .text-purple-600,
+body.dark .bg-white .text-green-600,
+body.dark .bg-white .text-blue-100,
+body.dark .bg-white .text-purple-100,
+body.dark .bg-white .text-green-100 {
+  color: inherit !important;
+  filter: none !important;
 }

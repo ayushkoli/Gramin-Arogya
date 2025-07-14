@@ -72,8 +72,12 @@
       <header class="header">
         <div class="header-container">
           <div class="header-actions">
-            <!-- Add Google Translate Element -->
-            <div id="google_translate_element"></div>
+            <div class="user-profile">
+              <span id="patientName"></span>
+            </div>
+            <button id="theme-toggle" aria-label="Toggle dark mode" class="flex items-center gap-2 ml-2">
+              <i id="theme-icon" class="fas fa-moon"></i>
+            </button>
             <button onclick="logout()" class="flex items-center gap-2">
               <i class="fas fa-sign-out-alt"></i>
               <span>Logout</span>
@@ -125,22 +129,6 @@
           >
             <i class="fas fa-hand-holding-medical w-6"></i>
             <span class="ml-2">Health Schemes</span>
-          </a>
-          <a
-            href="health-monitor.html"
-            id="health-monitor-link"
-            class="nav-link"
-          >
-            <i class="fas fa-heartbeat w-6"></i>
-            <span class="ml-2">Health Monitor</span>
-          </a>
-          <a
-            href="medical-records.html"
-            id="medical-records-link"
-            class="nav-link"
-          >
-            <i class="fas fa-notes-medical"></i>
-            <span>Medical Records</span>
           </a>
         </nav>
       </aside>
@@ -1153,5 +1141,44 @@
     </script>
     <script src="https://js.puter.com/v2/"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+      // Theme toggle logic with localStorage persistence
+      document.addEventListener('DOMContentLoaded', function () {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const root = document.documentElement;
+        // Read theme from localStorage or default to dark
+        let darkMode = localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme');
+
+        function setDarkTheme() {
+          root.style.setProperty('--bg-light', '#181c24');
+          root.style.setProperty('--bg-white', '#23272f');
+          root.style.setProperty('--background-light', '#23272f');
+          root.style.setProperty('--text-primary', '#f3f4f6');
+          document.body.classList.add('dark');
+          themeIcon.classList.remove('fa-sun');
+          themeIcon.classList.add('fa-moon');
+          localStorage.setItem('theme', 'dark');
+        }
+        function setLightTheme() {
+          root.style.setProperty('--bg-light', '#f8fafc');
+          root.style.setProperty('--bg-white', '#ffffff');
+          root.style.setProperty('--background-light', '#F9FAFB');
+          root.style.setProperty('--text-primary', '#1a1f36');
+          document.body.classList.remove('dark');
+          themeIcon.classList.remove('fa-moon');
+          themeIcon.classList.add('fa-sun');
+          localStorage.setItem('theme', 'light');
+        }
+        themeToggle.addEventListener('click', function () {
+          darkMode = !darkMode;
+          if (darkMode) setDarkTheme();
+          else setLightTheme();
+        });
+        // Set initial theme
+        if (darkMode) setDarkTheme();
+        else setLightTheme();
+      });
+    </script>
   </body>
 </html>
