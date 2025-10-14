@@ -144,7 +144,7 @@ In rural areas, access to quality healthcare remains a significant challenge due
 1. Clone the repository
 
 bash
-git clone https://github.com/yourusername/healthcare-platform.git
+https://github.com/ayushkoli/Gramin-Arogya.git
 
 
 2. Install dependencies
@@ -187,3 +187,4 @@ For support, please email support@graminarogya.com or raise an issue in the repo
 ---
 
 Made with ❤ for Rural Healthcare
+
