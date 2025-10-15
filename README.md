@@ -11,6 +11,51 @@ In rural areas, access to quality healthcare remains a significant challenge due
 - Poor health monitoring and preventive care
 - Limited access to health schemes and benefits
 
+  Here’s a clean and professional **README-ready version** of your “Getting Started” section 👇
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to set up and run the project locally:
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/ayushkoli/Gramin-Arogya.git
+cd Gramin-Arogya
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Set Up Environment Variables
+
+```bash
+cp .env.example .env
+```
+
+Then open the `.env` file and update it with your configuration details.
+
+### 4. Start the Server
+
+```bash
+npm start
+```
+
+### 5. Access the Application
+
+Open your browser and visit:
+👉 **[http://localhost:3000](http://localhost:3000)**
+
+---
+
+Would you like me to add a **"Deployment"** section after this (for Render or Vercel)?
+
+
 ## Solution
 
 ग्रामीण-आरोग्य is an innovative AI-powered healthcare platform designed to bridge the healthcare gap in rural areas by providing:
@@ -139,37 +184,6 @@ In rural areas, access to quality healthcare remains a significant challenge due
   - Health monitoring
   - Anomaly detection
 
-## Getting Started
-
-1. Clone the repository
-
-bash
-https://github.com/ayushkoli/Gramin-Arogya.git
-
-
-2. Install dependencies
-
-bash
-npm install
-
-
-3. Set up environment variables
-
-bash
-cp .env.example .env
-# Edit .env with your configuration
-
-
-4. Start the server
-
-bash
-npm start
-
-
-5. Access the application
-
-
-http://localhost:3000
 
 
 ## Contributing
@@ -187,4 +201,5 @@ For support, please email support@graminarogya.com or raise an issue in the repo
 ---
 
 Made with ❤ for Rural Healthcare
+
 
